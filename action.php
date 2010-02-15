@@ -54,46 +54,12 @@ class action_plugin_newpagetemplate extends DokuWiki_Action_Plugin {
           $tpl = str_replace(trim($value[0]),trim($value[1]),$tpl);
 	}
       }
- 
+
       if($this->getConf('standardreplace')) {
         // replace placeholders
-        $file = noNS($ID);
-        $page = strtr($file,'_',' ');
- 
-        $tpl = str_replace(array(
-                              '@ID@',
-                              '@NS@',
-                              '@FILE@',
-                              '@!FILE@',
-                              '@!FILE!@',
-                              '@PAGE@',
-                              '@!PAGE@',
-                              '@!!PAGE@',
-                              '@!PAGE!@',
-                              '@USER@',
-                              '@NAME@',
-                              '@MAIL@',
-                              '@DATE@',
-                           ),
-                           array(
-                              $ID,
-                              getNS($ID),
-                              $file,
-                              utf8_ucfirst($file),
-                              utf8_strtoupper($file),
-                              $page,
-                              utf8_ucfirst($page),
-                              utf8_ucwords($page),
-                              utf8_strtoupper($page),
-                              $_SERVER['REMOTE_USER'],
-                              $INFO['userinfo']['name'],
-                              $INFO['userinfo']['mail'],
-                              $conf['dformat'],
-                           ), $tpl);
- 
-        // we need the callback to work around strftime's char limit
-        $tpl = preg_replace_callback('/%./',create_function('$m','return strftime($m[0]);'),$tpl);
+        $tpl = parsePageTemplate($tpl, $ID);
       }
+
       $event->result=$tpl;
       $event->preventDefault(); 
     }
